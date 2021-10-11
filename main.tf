@@ -3,7 +3,7 @@ data "azurerm_resource_group" "my" {
 }
 
 data "azurerm_log_analytics_workspace" "my" {
-  name = var.log_analytics_workspace_name
+  name                = var.log_analytics_workspace_name
   resource_group_name = data.azurerm_resource_group.my.name
 }
 
@@ -17,8 +17,8 @@ data "azurerm_kubernetes_service_versions" "current" {
 }
 
 locals {
-  aks_cluster_name = "${var.base_name}-${var.environment}"
-  query_rules_alert    = "${var.base_name}-${var.environment}-query-rules-alert"
+  aks_cluster_name  = "${var.base_name}-${var.environment}"
+  query_rules_alert = "${var.base_name}-${var.environment}-query-rules-alert"
 
   tags = {
     app         = var.base_name
@@ -47,7 +47,7 @@ resource "azurerm_kubernetes_cluster" "my" {
     max_count           = var.max_count
     min_count           = var.min_count
     #vnet_subnet_id      = var.private_cluster_enabled ? azurerm_subnet.my[0].id : null
-    max_pods            = var.max_pods
+    max_pods = var.max_pods
   }
 
   addon_profile {
