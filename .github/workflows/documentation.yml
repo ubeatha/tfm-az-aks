@@ -1,0 +1,49 @@
+name: Generate terraform docs and format
+on:
+  - pull_request
+
+jobs:
+  docs:
+    name: 'Terraform Docs'
+    runs-on: ubuntu-latest
+    steps:
+    - name: 'Checkout'
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+    - name: 'Render terraform docs and push changes back to PR'
+      uses: terraform-docs/gh-actions@main
+      with:
+        working-dir: .
+        output-file: README.md
+        output-method: inject
+        git-push: "true"
+  format:
+    name: 'Terraform Format'
+    runs-on: ubuntu-latest
+    steps:
+    - name: 'Checkout'
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.ref }}
+    # - name: 'Terraform Format'
+    #   uses: hashicorp/terraform-github-actions@master
+    #   with:
+    #     tf_actions_version: 1.0.8
+    #     tf_actions_subcommand: 'fmt'
+    #     tf_actions_working_dir: '.'
+    #     tf_actions_comment: false
+    #     tf_actions_fmt_write: true
+    - name: 'Setup Terraform'
+      uses: hashicorp/setup-terraform@v1
+    - name: 'Terraform format'
+      id: fmt
+      run: terraform fmt -recursive
+      continue-on-error: true
+    - name: Commit format changes
+      run: |
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email '<github-actions[bot]@users.noreply.github.com>'
+        git add .
+        git diff-index --quiet HEAD || git commit -m "Terraform files after terraform fmt"
+        git push
